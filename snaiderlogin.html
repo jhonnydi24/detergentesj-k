@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snaider's Clean | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #4ade80; 
+            --dark-bg: #000000;
+            --card-bg: #0a0a0a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+        body {
+            background-color: var(--dark-bg);
+            font-family: 'Roboto', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- BURBUJAS VERDES --- */
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 50%;
+            animation: rise 15s infinite ease-in;
+            z-index: 0;
+        }
+
+        @keyframes rise {
+            0% { bottom: -100px; transform: translateX(0); opacity: 0; }
+            20% { opacity: 0.5; }
+            100% { bottom: 110vh; transform: translateX(100px); opacity: 0; }
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            width: 350px;
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            text-align: center;
+            box-shadow: 0 0 40px rgba(74, 222, 128, 0.15);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .logo-container img {
+            width: 130px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 8px var(--primary-green));
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: white;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .brand-sub {
+            color: var(--primary-green);
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            letter-spacing: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary-green); }
+
+        .btn-access {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-green);
+            color: black;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-access:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+        }
+
+        #error-msg {
+            color: #ff4444;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            display: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="bubble" style="width:70px; height:70px; left:10%; animation-duration:10s;"></div>
+    <div class="bubble" style="width:30px; height:30px; left:80%; animation-duration:15s; animation-delay:3s;"></div>
+
+    <div class="login-card">
+        <div class="logo-container">
+            <img src="logo_snaider.png" alt="Snaider's Logo">
+        </div>
+        <h1>Snaider's</h1>
+        <div class="brand-sub">CLEAN</div>
+
+        <input type="text" id="user" placeholder="Usuario" autocomplete="off">
+        <input type="password" id="pass" placeholder="Contraseña">
+
+        <button class="btn-access" onclick="auth()">Entrar al Panel</button>
+        
+        <p id="error-msg">⚠️ ACCESO DENEGADO</p>
+    </div>
+
+    <script>
+        // Credenciales autorizadas
+        const CREDENTIALS = {
+            "jdiaz": "Jhonny24KJ",
+            "admin": "Snaider2026"
+        };
+
+        function auth() {
+            const u = document.getElementById('user').value.trim();
+            const p = document.getElementById('pass').value.trim();
+            const err = document.getElementById('error-msg');
+
+            if(CREDENTIALS[u] && CREDENTIALS[u] === p) {
+                // Guardamos sesión y redirigimos al nuevo index
+                localStorage.setItem('snaider_session', 'active');
+                window.location.href = "indexsnaider.html";
+            } else {
+                err.style.display = 'block';
+                document.getElementById('pass').value = "";
+                setTimeout(() => { err.style.display = 'none'; }, 2500);
+            }
+        }
+
+        // Enter para ingresar
+        document.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') auth();
+        });
+    </script>
+</body>
+</html>
