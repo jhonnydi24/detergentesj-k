@@ -3,28 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedido Inteligente - DETERGENTES K & J</title>
+    <title>Pedido Inteligente - J & K DETERGENTES</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Roboto', sans-serif; margin: 20px; background: #f1f5f9; color: #1e293b; }
-        .pedido-container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #38bdf8; text-align: center; text-transform: uppercase; font-weight: 900; }
+        .pedido-container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; }
+        
+        h1 { color: #38bdf8; text-align: center; text-transform: uppercase; font-weight: 900; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #64748b; margin-bottom: 25px; }
+
+        /* Estilos Tabla (Mantenimiento del formato original) */
         table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
         th, td { text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0; }
         th { background-color: #38bdf8; color: white; text-transform: uppercase; font-size: 0.85rem; }
         td:first-child { text-align: left; font-weight: 500; }
+        
         .cantidad-input { width: 60px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 5px; text-align: center; }
         .total-compra-box { background-color: #0f172a; color: white; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.3rem; font-weight: 900; border: 2px solid #38bdf8; }
+        
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
         .detal-badge { background: #e2e8f0; color: #475569; }
         .mayor-badge { background: #10b981; color: white; }
+
+        /* Panel Admin J & K */
+        .admin-btn { position: absolute; top: 10px; right: 10px; opacity: 0.3; cursor: pointer; border: none; background: none; font-size: 12px; }
+        .admin-panel { display: none; background: #f8fafc; border: 2px dashed #38bdf8; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 5px; }
+        .btn-save { background: #10b981; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="pedido-container">
+        <button class="admin-btn" onclick="accesoAdmin()">⚙️</button>
+        
         <h1>Formulario de Pedido</h1>
-        <p style="text-align:center; color: #64748b;">(Precios al Mayor automáticos a partir de 10 unidades)</p>
+        <p class="subtitle">(Precios al Mayor automáticos a partir de 10 unidades)</p>
+
+        <div id="panelAdmin" class="admin-panel">
+            <h3 style="margin-top:0">Panel de Control J & K</h3>
+            <div id="listaAdmin"></div>
+            <button class="btn-save" onclick="subirPrecios()">GUARDAR CAMBIOS EN LA NUBE</button>
+        </div>
 
         <table>
             <thead>
@@ -37,64 +57,8 @@
                     <th>Subtotal (Bs.)</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr data-detal="550" data-mayor="420">
-                    <td>Ariel</td>
-                    <td>550</td><td>420</td>
-                    <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                    <td><span class="badge detal-badge">Detal</span></td>
-                    <td><span class="subtotal">0.00</span> Bs.</td>
-                </tr>
-                <tr data-detal="550" data-mayor="420">
-                    <td>Cera</td>
-                    <td>550</td><td>420</td>
-                    <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                    <td><span class="badge detal-badge">Detal</span></td>
-                    <td><span class="subtotal">0.00</span> Bs.</td>
-                </tr>
-                <tr data-detal="150" data-mayor="100">
-                    <td>Cloro</td>
-                    <td>150</td><td>100</td>
-                    <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                    <td><span class="badge detal-badge">Detal</span></td>
-                    <td><span class="subtotal">0.00</span> Bs.</td>
-                </tr>
-                <tr data-detal="550" data-mayor="420">
-                    <td>Desengrasante</td>
-                    <td>550</td><td>420</td>
-                    <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                    <td><span class="badge detal-badge">Detal</span></td>
-                    <td><span class="subtotal">0.00</span> Bs.</td>
-                </tr>
-                <tr data-detal="200" data-mayor="160">
-                    <td>Desinfectante</td>
-                    <td>200</td><td>160</td>
-                    <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                    <td><span class="badge detal-badge">Detal</span></td>
-                    <td><span class="subtotal">0.00</span> Bs.</td>
-                </tr>
-                <tr data-detal="200" data-mayor="160">
-                    <td>Jabón Líquido</td>
-                    <td>200</td><td>160</td>
-                    <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                    <td><span class="badge detal-badge">Detal</span></td>
-                    <td><span class="subtotal">0.00</span> Bs.</td>
-                </tr>
-                <tr data-detal="550" data-mayor="420">
-                    <td>Lavaplatos</td>
-                    <td>550</td><td>420</td>
-                    <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                    <td><span class="badge detal-badge">Detal</span></td>
-                    <td><span class="subtotal">0.00</span> Bs.</td>
-                </tr>
-                <tr data-detal="350" data-mayor="280">
-                    <td>Suavizante</td>
-                    <td>350</td><td>280</td>
-                    <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                    <td><span class="badge detal-badge">Detal</span></td>
-                    <td><span class="subtotal">0.00</span> Bs.</td>
-                </tr>
-            </tbody>
+            <tbody id="tablaProductos">
+                </tbody>
         </table>
 
         <div class="total-compra-box">
@@ -103,36 +67,121 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+
     <script>
+        // CONFIGURACIÓN REAL DE J-K-DETERGENTES
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyiAZF6NLABCB5WsK31FaWeitw1J0KLAU",
+            authDomain: "j-k-detergentes.firebaseapp.com",
+            databaseURL: "https://j-k-detergentes-default-rtdb.firebaseio.com",
+            projectId: "j-k-detergentes",
+            storageBucket: "j-k-detergentes.firebasestorage.app",
+            messagingSenderId: "973481194859",
+            appId: "1:973481194859:web:8850201ec04378bcf5c82e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const refProd = db.ref('productos');
+
+        // LEER PRECIOS EN TIEMPO REAL
+        refProd.on('value', (snapshot) => {
+            const productos = snapshot.val();
+            if (productos) {
+                dibujarTablas(productos);
+            } else {
+                // Datos iniciales si la DB está vacía
+                const inicial = [
+                    {nombre: "Ariel", detal: 550, mayor: 420},
+                    {nombre: "Cera", detal: 550, mayor: 420},
+                    {nombre: "Cloro", detal: 150, mayor: 100},
+                    {nombre: "Desengrasante", detal: 550, mayor: 420},
+                    {nombre: "Desinfectante", detal: 200, mayor: 160},
+                    {nombre: "Jabón Líquido", detal: 200, mayor: 160},
+                    {nombre: "Lavaplatos", detal: 550, mayor: 420},
+                    {nombre: "Suavizante", detal: 350, mayor: 280}
+                ];
+                refProd.set(inicial);
+            }
+        });
+
+        function dibujarTablas(productos) {
+            const tbody = document.getElementById('tablaProductos');
+            const lAdmin = document.getElementById('listaAdmin');
+            tbody.innerHTML = "";
+            lAdmin.innerHTML = "";
+
+            productos.forEach((p, i) => {
+                // Fila de pedido
+                tbody.innerHTML += `
+                    <tr data-detal="${p.detal}" data-mayor="${p.mayor}">
+                        <td>${p.nombre}</td>
+                        <td>${p.detal}</td>
+                        <td>${p.mayor}</td>
+                        <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
+                        <td><span class="badge detal-badge">Detal</span></td>
+                        <td><span class="subtotal">0.00</span> Bs.</td>
+                    </tr>
+                `;
+                // Fila admin
+                lAdmin.innerHTML += `
+                    <div class="admin-row">
+                        <span>${p.nombre}</span>
+                        <input type="number" class="edit-detal" value="${p.detal}">
+                        <input type="number" class="edit-mayor" value="${p.mayor}">
+                    </div>
+                `;
+            });
+            calcular();
+        }
+
         function calcular() {
-            let totalGeneral = 0;
+            let total = 0;
             const filas = document.querySelectorAll('tbody tr');
-
             filas.forEach(fila => {
-                const pDetal = parseFloat(fila.getAttribute('data-detal'));
-                const pMayor = parseFloat(fila.getAttribute('data-mayor'));
-                const input = fila.querySelector('.cantidad-input');
+                const det = parseFloat(fila.getAttribute('data-detal'));
+                const may = parseFloat(fila.getAttribute('data-mayor'));
+                const cant = parseInt(fila.querySelector('.cantidad-input').value) || 0;
                 const badge = fila.querySelector('.badge');
-                const subLabel = fila.querySelector('.subtotal');
+                
+                let precio = (cant >= 10) ? may : det;
+                badge.textContent = (cant >= 10) ? "AL MAYOR" : "DETAL";
+                badge.className = "badge " + ((cant >= 10) ? "mayor-badge" : "detal-badge");
 
-                let cant = parseInt(input.value) || 0;
-                let precioAplicado = (cant >= 10) ? pMayor : pDetal;
+                let sub = cant * precio;
+                fila.querySelector('.subtotal').textContent = sub.toFixed(2);
+                total += sub;
+            });
+            document.getElementById('totalFinal').textContent = total.toFixed(2);
+        }
 
-                // Actualizar visualmente el tipo de precio
-                if (cant >= 10) {
-                    badge.textContent = "AL MAYOR";
-                    badge.className = "badge mayor-badge";
-                } else {
-                    badge.textContent = "DETAL";
-                    badge.className = "badge detal-badge";
-                }
+        function accesoAdmin() {
+            const clave = prompt("Clave J & K:");
+            if (clave === "Jhonny24KJ") {
+                document.getElementById('panelAdmin').style.display = 'block';
+            }
+        }
 
-                let subtotal = cant * precioAplicado;
-                subLabel.textContent = subtotal.toFixed(2);
-                totalGeneral += subtotal;
+        function subirPrecios() {
+            const nombres = document.querySelectorAll('.admin-row span');
+            const detals = document.querySelectorAll('.edit-detal');
+            const mayors = document.querySelectorAll('.edit-mayor');
+            let nuevos = [];
+            
+            nombres.forEach((n, i) => {
+                nuevos.push({
+                    nombre: n.textContent,
+                    detal: parseFloat(detals[i].value),
+                    mayor: parseFloat(mayors[i].value)
+                });
             });
 
-            document.getElementById('totalFinal').textContent = totalGeneral.toFixed(2);
+            refProd.set(nuevos).then(() => {
+                alert("Nube de J & K Actualizada");
+                document.getElementById('panelAdmin').style.display = 'none';
+            });
         }
     </script>
 </body>
