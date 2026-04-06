@@ -12,7 +12,6 @@
         h1 { color: #38bdf8; text-align: center; text-transform: uppercase; font-weight: 900; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #64748b; margin-bottom: 25px; }
 
-        /* Estilos Tabla (Mantenimiento del formato original) */
         table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
         th, td { text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0; }
         th { background-color: #38bdf8; color: white; text-transform: uppercase; font-size: 0.85rem; }
@@ -28,8 +27,9 @@
         /* Panel Admin J & K */
         .admin-btn { position: absolute; top: 10px; right: 10px; opacity: 0.3; cursor: pointer; border: none; background: none; font-size: 12px; }
         .admin-panel { display: none; background: #f8fafc; border: 2px dashed #38bdf8; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 5px; }
+        .admin-row { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 5px; align-items: center; }
         .btn-save { background: #10b981; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        input[type="number"] { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
@@ -41,7 +41,10 @@
         <p class="subtitle">(Precios al Mayor automáticos a partir de 10 unidades)</p>
 
         <div id="panelAdmin" class="admin-panel">
-            <h3 style="margin-top:0">Panel de Control J & K</h3>
+            <h3 style="margin-top:0 text-align:center;">Panel de Control J & K</h3>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; font-weight: bold; margin-bottom: 10px;">
+                <span>Producto</span><span>Detal</span><span>Mayor</span>
+            </div>
             <div id="listaAdmin"></div>
             <button class="btn-save" onclick="subirPrecios()">GUARDAR CAMBIOS EN LA NUBE</button>
         </div>
@@ -67,67 +70,57 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
 
     <script>
-        // CONFIGURACIÓN REAL DE J-K-DETERGENTES
-        const firebaseConfig = {
-            apiKey: "AIzaSyAyiAZF6NLABCB5WsK31FaWeitw1J0KLAU",
-            authDomain: "j-k-detergentes.firebaseapp.com",
-            databaseURL: "https://j-k-detergentes-default-rtdb.firebaseio.com",
-            projectId: "j-k-detergentes",
-            storageBucket: "j-k-detergentes.firebasestorage.app",
-            messagingSenderId: "973481194859",
-            appId: "1:973481194859:web:8850201ec04378bcf5c82e"
-        };
+        // 1. CONFIGURACIÓN DE CONEXIÓN (Basada en tus capturas)
+        const { Client, Databases, ID } = Appwrite;
+        const client = new Client()
+            .setEndpoint('https://cloud.appwrite.io/v1')
+            .setProject('69d39d1f0009dc7daec4'); // ID de tu imagen
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const refProd = db.ref('productos');
+        const databases = new Databases(client);
+        const DATABASE_ID = 'tienda'; 
+        const COLLECTION_ID = 'productos';
 
-        // LEER PRECIOS EN TIEMPO REAL
-        refProd.on('value', (snapshot) => {
-            const productos = snapshot.val();
-            if (productos) {
-                dibujarTablas(productos);
-            } else {
-                // Datos iniciales si la DB está vacía
-                const inicial = [
-                    {nombre: "Ariel", detal: 600, mayor: 500},
-                    {nombre: "Cera", detal: 600, mayor: 500},
-                    {nombre: "Cloro", detal: 200, mayor: 120},
-                    {nombre: "Desengrasante", detal: 600, mayor: 500},
-                    {nombre: "Desinfectante", detal: 300, mayor: 200},
-                    {nombre: "Jabón Líquido", detal: 300, mayor: 200},
-                    {nombre: "Lavaplatos", detal: 600, mayor: 500},
-                    {nombre: "Suavizante", detal: 400, mayor: 350}
-                ];
-                refProd.set(inicial);
+        // 2. CARGAR PRODUCTOS AL INICIAR
+        async function cargarProductos() {
+            try {
+                const response = await databases.listDocuments(DATABASE_ID, COLLECTION_ID);
+                const productos = response.documents;
+                
+                if (productos.length > 0) {
+                    dibujarInterfaz(productos);
+                } else {
+                    alert("La base de datos está vacía. Agregue productos en el panel de Appwrite.");
+                }
+            } catch (error) {
+                console.error("Error Appwrite:", error);
+                alert("Error de conexión. Verifica los permisos en Appwrite.");
             }
-        });
+        }
 
-        function dibujarTablas(productos) {
+        function dibujarInterfaz(productos) {
             const tbody = document.getElementById('tablaProductos');
             const lAdmin = document.getElementById('listaAdmin');
             tbody.innerHTML = "";
             lAdmin.innerHTML = "";
 
-            productos.forEach((p, i) => {
-                // Fila de pedido
+            productos.forEach((p) => {
+                // Fila para el cliente
                 tbody.innerHTML += `
                     <tr data-detal="${p.detal}" data-mayor="${p.mayor}">
                         <td>${p.nombre}</td>
                         <td>${p.detal}</td>
                         <td>${p.mayor}</td>
                         <td><input type="number" class="cantidad-input" value="0" min="0" oninput="calcular()"></td>
-                        <td><span class="badge detal-badge">Detal</span></td>
+                        <td><span class="badge detal-badge">DETAL</span></td>
                         <td><span class="subtotal">0.00</span> Bs.</td>
                     </tr>
                 `;
-                // Fila admin
+                // Fila para el administrador
                 lAdmin.innerHTML += `
-                    <div class="admin-row">
+                    <div class="admin-row" data-id="${p.$id}">
                         <span>${p.nombre}</span>
                         <input type="number" class="edit-detal" value="${p.detal}">
                         <input type="number" class="edit-mayor" value="${p.mayor}">
@@ -137,9 +130,10 @@
             calcular();
         }
 
+        // 3. LÓGICA DE CÁLCULO
         function calcular() {
             let total = 0;
-            const filas = document.querySelectorAll('tbody tr');
+            const filas = document.querySelectorAll('#tablaProductos tr');
             filas.forEach(fila => {
                 const det = parseFloat(fila.getAttribute('data-detal'));
                 const may = parseFloat(fila.getAttribute('data-mayor'));
@@ -157,32 +151,46 @@
             document.getElementById('totalFinal').textContent = total.toFixed(2);
         }
 
+        // 4. FUNCIONES ADMINISTRATIVAS
         function accesoAdmin() {
             const clave = prompt("Clave J & K:");
             if (clave === "Jhonny24KJ") {
                 document.getElementById('panelAdmin').style.display = 'block';
+            } else {
+                alert("Clave incorrecta");
             }
         }
 
-        function subirPrecios() {
-            const nombres = document.querySelectorAll('.admin-row span');
-            const detals = document.querySelectorAll('.edit-detal');
-            const mayors = document.querySelectorAll('.edit-mayor');
-            let nuevos = [];
+        async function subirPrecios() {
+            const adminRows = document.querySelectorAll('.admin-row');
+            const btn = document.querySelector('.btn-save');
+            btn.disabled = true;
+            btn.textContent = "ACTUALIZANDO...";
             
-            nombres.forEach((n, i) => {
-                nuevos.push({
-                    nombre: n.textContent,
-                    detal: parseFloat(detals[i].value),
-                    mayor: parseFloat(mayors[i].value)
-                });
-            });
+            try {
+                for (let row of adminRows) {
+                    const docId = row.getAttribute('data-id');
+                    const nuevoDetal = parseFloat(row.querySelector('.edit-detal').value);
+                    const nuevoMayor = parseFloat(row.querySelector('.edit-mayor').value);
 
-            refProd.set(nuevos).then(() => {
-                alert("Nube de J & K Actualizada");
+                    await databases.updateDocument(DATABASE_ID, COLLECTION_ID, docId, {
+                        detal: nuevoDetal,
+                        mayor: nuevoMayor
+                    });
+                }
+                alert("Nube de J & K Actualizada con éxito");
                 document.getElementById('panelAdmin').style.display = 'none';
-            });
+                cargarProductos(); // Recargar la tabla con los nuevos precios
+            } catch (error) {
+                alert("Error al guardar: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "GUARDAR CAMBIOS EN LA NUBE";
+            }
         }
+
+        // Iniciar la aplicación
+        window.onload = cargarProductos;
     </script>
 </body>
 </html>
